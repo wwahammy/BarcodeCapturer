@@ -128,7 +128,14 @@ namespace BooksSilverlight {
         /// </summary>
         public static DispatcherOperation UIThreadInvoke(Action a) {
 
-                return Deployment.Current.Dispatcher.BeginInvoke(a);
+            if (isUIThread)
+            {
+                a.Invoke();
+                return null;
+            }
+            else
+            { return Deployment.Current.Dispatcher.BeginInvoke(a); }
+                
         }
 
         /// <summary>

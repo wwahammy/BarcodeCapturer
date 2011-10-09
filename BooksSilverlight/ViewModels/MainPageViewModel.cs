@@ -11,6 +11,7 @@ using System.Windows.Shapes;
 using BooksSilverlight.BL;
 using CaptureDevice = System.Windows.Media.CaptureDevice;
 using System.Collections.ObjectModel;
+using System.Windows.Media.Imaging;
 
 namespace BooksSilverlight.ViewModels {
     public class MainPageViewModel : ViewModelBase
@@ -79,6 +80,7 @@ namespace BooksSilverlight.ViewModels {
             {
                 if (CaptureDevice == null)
                 {
+                    new BitmapImage();
                     return new SolidColorBrush(Colors.Black);
                 }
                 else

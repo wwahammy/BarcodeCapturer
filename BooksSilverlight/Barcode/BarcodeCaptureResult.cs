@@ -13,6 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using BooksSilverlight.Extensions;
 using ExifLib;
+using ImageTools;
+using ImageTools.IO.Jpeg;
 
 namespace BooksSilverlight.Barcode {
     /// <summary>
@@ -44,15 +46,16 @@ namespace BooksSilverlight.Barcode {
         /// Default constructor. Object will be left in the Initializing state, which should be changed to Success/Failed/Unknown when finished processing.
         /// </summary>
         public BarcodeCaptureResult() {
-            BarcodeFormat = com.google.zxing.BarcodeFormat.UPC_EAN; //Set barcode type for these results
+            BarcodeFormat = com.google.zxing.BarcodeFormat.UPC_E; //Set barcode type for these results
             State = CaptureState.Initializing;
         }
         
         public BarcodeCaptureResult(WriteableBitmap writeableBitmap)
         {
-            var memStream = new MemoryStream();
-            writeableBitmap.SaveJpeg(memStream, writeableBitmap.PixelWidth, writeableBitmap.PixelHeight, 0, 95);
-            SetupBarcodeImages(memStream);
+            //BarcodeImage = image;
+
+           
+           SetupBarcodeImages(writeableBitmap.Pixels);
         }
 
         /// <summary>
@@ -64,7 +67,7 @@ namespace BooksSilverlight.Barcode {
         public BarcodeCaptureResult(BitmapImage bmpBarcodeImage)
             : this() {
             BarcodeImage = bmpBarcodeImage;
-            SetupBarcodeImages();
+            //SetupBarcodeImages();
         }
 
         /// <summary>
@@ -73,18 +76,18 @@ namespace BooksSilverlight.Barcode {
         /// <param name="ImageStream">e.ChosenPhoto from the Camera PhotoResult, but could also be an Application.GetResourceStream</param>
         public BarcodeCaptureResult(System.IO.Stream ImageStream)
             : this() {
-            SetupBarcodeImages(ImageStream);
+            //SetupBarcodeImages(ImageStream);
         }
 
         /// <summary>
         /// Image of the barcode. When using the camera this is initialized using BarcodeImage.SetSource(e.ChosenPhoto) and is available immediatly (Other images are queued for processing);
         /// </summary>
-        public BitmapImage BarcodeImage { get; set; }
+        public BitmapImage BarcodeImage { get; private set;}
 
         /// <summary>
         /// VGA resolution version of BarcodeImage that will be used for processing
         /// </summary>
-        public WriteableBitmap VGABarcodeImage;
+        public int[] VGABarcodeImage;
 
         /// <summary>
         /// Cache used to store writeable bitmap version of BarcodeImage. 
@@ -188,10 +191,12 @@ namespace BooksSilverlight.Barcode {
         /// This method will setup the OriginalImage, VGABarcodeImage, and wbBarcodeImage values. It will also rotate the image if it was taken in portrait mode.
         /// </summary>
         /// <param name="ImageStream">Optional Stream to the original image (Use Camera PhotoResult or Application.GetResourceStream). Will use BarcodeImage.UriSource if omitted.</param>
-        private void SetupBarcodeImages(System.IO.Stream ImageStream = null) {
+        private void SetupBarcodeImages(int[] pixels) {
             
             if (BarcodeImage == null || BarcodeImage.PixelWidth == 0) {
-                if (ImageStream != null) {
+                
+                if (pixels != null) {
+                    /*
                     //Check image orientation. See http://timheuer.com/blog/archive/2010/09/23/working-with-pictures-in-camera-tasks-in-windows-phone-7-orientation-rotation.aspx
                     this.ExifInfo = ExifReader.ReadJpeg(ImageStream, "");
                     int _angle = 0;
@@ -215,8 +220,10 @@ namespace BooksSilverlight.Barcode {
                     if (_angle > 0d) {
                         ImageStream = RotateStream(ImageStream, _angle);
                         ExifInfo = ExifReader.ReadJpeg(ImageStream, ""); //reload info
-                    }
+                    }*/
 
+                    VGABarcodeImage = pixels;
+                    /*
                     using (var areSignal = new AutoResetEvent(false))
                     {
                         WP7Utilities.UIThreadInvoke(() => {
@@ -224,11 +231,11 @@ namespace BooksSilverlight.Barcode {
                                                               areSignal.Set();
                         });
                         areSignal.WaitOne();
-                    }
+                    }*/
 
-                    BarcodeImage.CreateOptions = BitmapCreateOptions.None;//Don't delay creation
+                    //BarcodeImage.CreateOptions = BitmapCreateOptions.None;//Don't delay creation
 
-                    BarcodeImage.SetSource(ImageStream);
+                    //BarcodeImage.SetSource(ImageStream);
                    
                 }
                 else {
@@ -238,24 +245,20 @@ namespace BooksSilverlight.Barcode {
             }
 
             State = CaptureState.ImageLoaded;
-            //Resize images to VGA or 1MP resolution
-            if (BarcodeImage.PixelWidth <= 1280 && BarcodeImage.PixelHeight <= 960) //Don't resize if image is below 1MP
-            {
-                VGABarcodeImage = GetWriteableBitmap(BarcodeImage.PixelWidth, BarcodeImage.PixelHeight, ImageStream);
-                if (BarcodeCaptureResult.SaveOriginalImage) {
-                    OriginalImage = VGABarcodeImage; //Input images is already the correct size
-                }
-            }
-            else //Resize images that are over 1MP down to VGA size
-            {
-                VGABarcodeImage = GetWriteableBitmap(640, 0, ImageStream);
-                if (BarcodeCaptureResult.SaveOriginalImage) {
-                    this.OriginalImage = GetWriteableBitmap(2592, 0, ImageStream); //TODO: use  EXIF info to get full size. For now always use 5MP Width
-                }
-            }
 
             this.isReadyForProcessing.Set();//Signal that object is ready for processing
            // SaveJPEGToIsolatedStorage("LastCapture.jpg"); //Save image to local storage.
+        }
+
+
+
+        private byte[] GetAllFromStream(Stream stream)
+        {
+            var length = stream.Length;
+            var output = new byte[length];
+            stream.Seek(0, SeekOrigin.Begin);
+            stream.Read(output, 0, (int)length);
+            return output;
         }
 
         public static Stream RotateStream(Stream stream, int angle) {

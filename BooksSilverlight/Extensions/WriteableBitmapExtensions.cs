@@ -13,10 +13,16 @@ namespace BooksSilverlight.Extensions
         {
             ExtendedImage image = null;
             var disp = bitmap.Dispatcher;
-            disp.BeginInvoke(() => image = bitmap.ToImage());               
-
-            while (image == null)
-                Thread.Sleep(10);
+            using (var are = new AutoResetEvent(false))
+            {
+                disp.BeginInvoke(() =>
+                {
+                    image = bitmap.ToImage();
+                    are.Set();
+                });
+                are.WaitOne();
+            }
+            
             var resizer = new NearestNeighborResizer();
             var imageBaseOut = new ExtendedImage(targetWidth, targetHeight);
             resizer.Resize(image, imageBaseOut, targetWidth, targetHeight);

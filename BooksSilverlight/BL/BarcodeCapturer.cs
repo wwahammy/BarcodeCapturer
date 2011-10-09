@@ -1,4 +1,6 @@
 ﻿using System;
+
+using System.Collections;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
@@ -10,7 +12,7 @@ namespace BooksSilverlight.BL
 {
     public class BarcodeCapturer
     {
-        public static System.Collections.Generic.Dictionary<object, object> zxingHints = new System.Collections.Generic.Dictionary<object, object>() { { DecodeHintType.TRY_HARDER, true } };
+        public static Hashtable zxingHints = new Hashtable() { { DecodeHintType.TRY_HARDER, true } };
         private Task _resultTask;
         private object _resultTaskLock = new object();
         Timer timer = null;
@@ -81,12 +83,13 @@ namespace BooksSilverlight.BL
                 }
 
 
-                if (captureResults.BarcodeImage != null) {
+                if (captureResults.VGABarcodeImage != null)
+                {
                     var wb = captureResults.VGABarcodeImage;
 
                     //Code from: btnReadTag_Click in "SLZXingQRSample\SLZXingQRSample\SLZXingSample\MainPage.xaml.vb"
                     var qrRead = new com.google.zxing.oned.MultiFormatUPCEANReader(zxingHints); ; // new com.google.zxing.qrcode.QRCodeReader();
-                    var luminiance = new RGBLuminanceSource(wb, wb.PixelWidth, wb.PixelHeight);
+                    var luminiance = new RGBLuminanceSource(wb, 640, 480);
                     var binarizer = new com.google.zxing.common.HybridBinarizer(luminiance);
                     var binBitmap = new com.google.zxing.BinaryBitmap(binarizer);
                     var results = qrRead.decode(binBitmap, zxingHints); //NOTE: will throw exception if cannot decode image.

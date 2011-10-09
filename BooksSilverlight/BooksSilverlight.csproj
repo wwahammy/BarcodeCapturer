@@ -74,9 +74,6 @@
       <HintPath>Lib\ImageTools\ImageTools.Utils.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
-    <Reference Include="Silverlight_ZXing_Core">
-      <HintPath>..\Silverlight_ZXing_Core.dll</HintPath>
-    </Reference>
     <Reference Include="System.Windows" />
     <Reference Include="system" />
     <Reference Include="System.Core" />
@@ -84,6 +81,9 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Windows.Browser" />
     <Reference Include="System.Xml.Linq, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="zxing.Silverlight, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9b00a96d55051ebd, processorArchitecture=MSIL">
+      <HintPath>Lib\ImageTools\zxing.Silverlight.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.xaml.cs">
