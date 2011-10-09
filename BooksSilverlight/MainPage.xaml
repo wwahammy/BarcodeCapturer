@@ -1,0 +1,14 @@
+﻿<UserControl x:Class="BooksSilverlight.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="400" d:DesignWidth="400" Loaded="UserControl_Loaded">
+   
+    <StackPanel x:Name="LayoutRoot" Background="White" Width="400" Height="353">
+        <Rectangle Height="275" HorizontalAlignment="Left" Margin="12,13,0,0" Name="CamDisplay" StrokeThickness="1" VerticalAlignment="Top" Width="376" Fill="{Binding Path=CaptureBrush}"/>
+        <Button Click="Button_Click" Height="55" Width="100">Fun</Button>
+        <TextBlock Text="{Binding Path=UPCString}"></TextBlock>
+    </StackPanel>
+</UserControl>
