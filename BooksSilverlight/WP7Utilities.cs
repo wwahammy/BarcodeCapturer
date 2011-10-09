@@ -127,12 +127,7 @@ namespace BooksSilverlight {
         /// Example: WP7Utilities.UIThreadInvoke(new Action(() => {BitmapImage x = new BitmapImage();}) 
         /// </summary>
         public static DispatcherOperation UIThreadInvoke(Action a) {
-            if (isUIThread)
-            {
-                a.Invoke();
-                return null;
-            }
-            else
+
                 return Deployment.Current.Dispatcher.BeginInvoke(a);
         }
 
@@ -141,12 +136,7 @@ namespace BooksSilverlight {
         /// Example: WP7Utilities.UIThreadInvoke(new Action(() => {BitmapImage x = new BitmapImage();}) 
         /// </summary>
         public static DispatcherOperation UIThreadInvoke(Delegate d, params object[] args) {
-            if (isUIThread)
-            {
-                d.DynamicInvoke(args);
-                return null;
-            }
-            else
+
                 return Deployment.Current.Dispatcher.BeginInvoke(d, args);
         }
 

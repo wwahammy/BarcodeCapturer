@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -216,8 +217,15 @@ namespace BooksSilverlight.Barcode {
                         ExifInfo = ExifReader.ReadJpeg(ImageStream, ""); //reload info
                     }
 
-                    WP7Utilities.UIThreadInvoke(() => new BitmapImage());
-                    
+                    using (var areSignal = new AutoResetEvent(false))
+                    {
+                        WP7Utilities.UIThreadInvoke(() => {
+                                                              BarcodeImage = new BitmapImage();
+                                                              areSignal.Set();
+                        });
+                        areSignal.WaitOne();
+                    }
+
                     BarcodeImage.CreateOptions = BitmapCreateOptions.None;//Don't delay creation
 
                     BarcodeImage.SetSource(ImageStream);

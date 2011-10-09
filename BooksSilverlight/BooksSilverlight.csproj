@@ -121,7 +121,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="BL\ClassDiagram1.cd" />
-    <None Include="ClassDiagram1.cd" />
     <None Include="Properties\AppManifest.xml" />
   </ItemGroup>
   <ItemGroup>

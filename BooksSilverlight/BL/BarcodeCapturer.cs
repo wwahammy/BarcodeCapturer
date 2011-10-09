@@ -54,9 +54,16 @@ namespace BooksSilverlight.BL
         private BarcodeCaptureResult CreateBarcodeCapture(WriteableBitmap bitmapIn)
         {
             BarcodeCaptureResult ret = null;
-            WP7Utilities.UIThreadInvoke(() => ret = new BarcodeCaptureResult(bitmapIn));
-            while (ret == null)
-                Thread.Sleep(50);
+            using (var are = new System.Threading.AutoResetEvent(false)) //Use AutoResetEvent to wait for results from dispatcher
+            {
+                WP7Utilities.UIThreadInvoke(() =>
+                                                {
+                                                    ret = new BarcodeCaptureResult(bitmapIn);
+                                                    are.Set();
+                                                });
+                are.WaitOne();
+            }
+
             return ret;
         }
 
